@@ -12,7 +12,7 @@ t_queue* create_queue(int size) {
     return queue;
 }
 
-int is_empty(t_queue* queue) {
+int is_empty (t_queue* queue) {
     return queue->end == -1;
 }
 
@@ -28,8 +28,11 @@ int is_full(t_queue* queue) {
     return size(queue) == queue->size;
 }
 
-void in(t_queue* queue, char* value) {
-    if (is_full(queue)) return;
+int in(t_queue* queue, char* value) {
+    if (is_full(queue)) {
+        return 0;
+    }
+    
     char* name = (char*) malloc(strlen(value) + 1);
     strcpy(name, value);
 
@@ -39,15 +42,16 @@ void in(t_queue* queue, char* value) {
     } else {
         queue->end = (queue->end + 1) % queue->size;
     }
+    
     queue->vector[queue->end] = name;
 }
 
-char* out(t_queue* queue) {
+int out(t_queue* queue, char** value){
     if (is_empty(queue)) {
-        return NULL;
+        return 0;
     }
-
-    char* removed = queue->vector[queue->start];
+    
+    *value = queue->vector[queue->start];
 
     if (queue->start == queue->end) {
         queue->start = 0;
@@ -55,24 +59,28 @@ char* out(t_queue* queue) {
     } else {
         queue->start = (queue->start + 1) % queue->size;
     }
-
-    return removed;
+    
+    return 1;
 }
 
 void print_queue(t_queue* queue) {
-    if (is_empty(queue)) return;
-    int count = size(queue);
-    for (int i = 0; i < count; i++) {
+    if (is_empty(queue)) {
+        return;
+    }
+
+    int queue_size = size(queue);
+    for (int i = 0; i < queue_size; i++) {
         int index = (queue->start + i) % queue->size;
         printf("%s \n", queue->vector[index]);
     }
+
     printf("\n");
 }
 
 void destroy(t_queue* queue) {
     if (!is_empty(queue)) {
-        int count = size(queue);
-        for (int i = 0; i < count; i++) {
+        int queue_size = size(queue);
+        for (int i = 0; i < queue_size; i++) {
             int index = (queue->start + i) % queue->size;
             free(queue->vector[index]);
         }
